@@ -96,7 +96,12 @@ class DownloadWorker(Thread):
             retry_times = 0
             while retry_times < RETRY:
                 try:
+                    # 增加User-Agent headers 模拟浏览器访问，防止被封
+                    headers = {'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',			
+                               'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36'}
+            
                     resp = requests.get(medium_url,
+                                        headers=headers,
                                         stream=True,
                                         proxies=self.proxies,
                                         timeout=TIMEOUT)
@@ -164,8 +169,12 @@ class CrawlerScheduler(object):
         start = START
         while True:
             media_url = base_url.format(site, medium_type, MEDIA_NUM, start)
-            response = requests.get(media_url,
-                                    proxies=self.proxies)
+            # 增加User-Agent headers 模拟浏览器访问，防止被封            
+            headers = {'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',			
+           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36'}
+            
+            response = requests.get(media_url,headers=headers,proxies=self.proxies)
+
             data = xmltodict.parse(response.content)
             try:
                 posts = data["tumblr"]["posts"]["post"]
