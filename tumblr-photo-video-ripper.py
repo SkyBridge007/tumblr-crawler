@@ -82,14 +82,20 @@ class DownloadWorker(Thread):
 
     def _download(self, medium_type, medium_url, target_folder):
         medium_name = medium_url.split("/")[-1].split("?")[0]
+        file_path = ""
         if medium_type == "video":
             if not medium_name.startswith("tumblr"):
                 medium_name = "_".join([medium_url.split("/")[-2],
                                         medium_name])
 
-            medium_name += ".mp4"
+            medium_name += ".mp4"            
 
+        # 将video资源和photo资源分开存储
+        target_folder = os.path.join(target_folder, medium_type)
+        if not os.path.isdir(target_folder):
+            os.mkdir(target_folder)
         file_path = os.path.join(target_folder, medium_name)
+		
         if not os.path.isfile(file_path):
             print("Downloading %s from %s.\n" % (medium_name,
                                                  medium_url))
@@ -163,7 +169,7 @@ class CrawlerScheduler(object):
         current_folder = os.getcwd()
         target_folder = os.path.join(current_folder, site)
         if not os.path.isdir(target_folder):
-            os.mkdir(target_folder)
+            os.mkdir(target_folder)            
 
         base_url = "https://{0}.tumblr.com/api/read?type={1}&num={2}&start={3}"
         start = START
